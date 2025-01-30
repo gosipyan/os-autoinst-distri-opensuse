@@ -11,6 +11,7 @@ use warnings;
 use base "consoletest";
 use testapi;
 use utils;
+use version_utils qw(has_selinux has_selinux_by_default);
 
 
 sub run {
@@ -20,6 +21,10 @@ sub run {
         record_info('No nested virt', 'No /dev/kvm found');
     }
 
+    # allow connect to httpd_port
+    #    if (has_selinux || has_selinux_by_default ) {
+    assert_script_run 'setsebool -P httpd_graceful_shutdown 1';
+	#}
     zypper_call('in openQA-bootstrap');
     my $proxy_var = get_var('OPENQA_WEB_PROXY') ? 'setup_web_proxy=' . get_var('OPENQA_WEB_PROXY') . ' ' : '';
     assert_script_run($proxy_var . "/usr/share/openqa/script/openqa-bootstrap", 4000);
