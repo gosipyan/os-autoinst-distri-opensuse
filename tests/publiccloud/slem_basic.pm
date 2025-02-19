@@ -77,6 +77,7 @@ sub run {
         die("Testing package \'$test_package\' is already installed, choose a different package!");
     }
     $instance->run_ssh_command(cmd => 'sudo transactional-update -n pkg install ' . $test_package, timeout => 600);
+    $instance->run_ssh_command(cmd => 'sudo transactional-update pkg install policycoreutils-python-utils');
     $instance->softreboot();
     $instance->run_ssh_command(cmd => 'rpm -q ' . $test_package);
 
@@ -111,6 +112,11 @@ sub run {
     $instance->ssh_assert_script_run(cmd => 'sudo systemctl is-enabled snapper-timeline.timer');
     $instance->ssh_assert_script_run(cmd => 'sudo systemctl is-active snapper-cleanup.timer');
     $instance->ssh_assert_script_run(cmd => 'sudo systemctl is-enabled snapper-cleanup.timer');
+
+    #debug seliux
+    $instance->ssh_script_run(cmd => 'sudo zypper info policycoreutils-python-utils');
+    $instance->ssh_script_run(cmd => 'sudo sestatus');
+    $instance->ssh_script_run(cmd => 'sudo audit2allow -w -a');
 
     # SElinux and logging tests
     $instance->run_ssh_command(cmd => 'sudo sestatus | grep enabled');
