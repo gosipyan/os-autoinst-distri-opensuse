@@ -31,6 +31,17 @@ sub check_avc {
     my ($self) = @_;
 
     my $instance = $self->{my_instance};
+        #debug seliux
+    $instance->ssh_script_run(cmd => 'sudo sestatus');
+    $instance->ssh_script_run(cmd => 'sudo   ps -eZ');
+    $instance->ssh_script_run(cmd => 'sudo   sealert -l "*"');
+    $instance->ssh_script_run(cmd => 'sudo matchpathcon -V /run/*');
+    #$instance->ssh_script_run(cmd => 'sudo audit2allow -a');
+    #$instance->ssh_script_run(cmd => 'sudo restorecon -R -v /run/*');
+    $instance->ssh_script_run(cmd => 'sudo ls -Z /run/*');
+    $instance->ssh_script_run(cmd => 'sudo ausearch -m avc --raw | audit2allow -M custom-policy');
+    $instance->ssh_script_run(cmd => 'sudo cat custom-policy.te');
+    $instance->ssh_script_run(cmd => 'sudo semodule -X 300 -i custom-policy.pp');
     # Read the Access Vector Cache to check for SELinux denials
     my $avc = $instance->ssh_script_output(cmd => 'sudo ausearch -ts boot -m avc --format raw', proceed_on_failure => 1, ssh_opts => '-t -o ControlPath=none');
     record_info("AVC at boot", $avc);
@@ -59,7 +70,7 @@ sub run {
     $provider = $self->{provider} = $args->{my_provider};
 
     # On SLEM 5.2+ check that we don't have any SELinux denials. This needs to happen before anything else is ongoing
-    $self->check_avc() unless (is_sle_micro('=5.1'));
+    #$self->check_avc() unless (is_sle_micro('=5.1'));
 
     my $test_package = get_var('TEST_PACKAGE', 'jq');
     $instance->run_ssh_command(cmd => 'zypper lr -d', timeout => 600);
@@ -76,9 +87,13 @@ sub run {
     unless ($ret) {
         die("Testing package \'$test_package\' is already installed, choose a different package!");
     }
+    $instance->run_ssh_command(cmd => 'sudo transactional-update -n pkg install policycoreutils-python-utils restorecond policycoreutils-devel setroubleshoot-plugins setroubleshoot-server', timeout => 600);
+    $instance->softreboot();
     $instance->run_ssh_command(cmd => 'sudo transactional-update -n pkg install ' . $test_package, timeout => 600);
     $instance->softreboot();
     $instance->run_ssh_command(cmd => 'rpm -q ' . $test_package);
+
+    $self->check_avc() unless (is_sle_micro('=5.1'));
 
     # cockpit test
     $instance->run_ssh_command(cmd => '! curl localhost:9090');
