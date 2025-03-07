@@ -29,23 +29,29 @@ sub run {
 
     if (is_sle) {
         # beta1 has dependency issue will enable with beta2
-        #if (is_sle('=16') || $sp_version == '16') {
-        #zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_16/ sensor");
-        #        }
+        if (is_sle('=16') || $sp_version == '16') {
+		#zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_16/ sensor");
+		zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/16/ sensor");
+                }
         if (is_sle('=15-SP7') || $sp_version == '15.7') {
-            zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP7/ sensor");
+		#zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP7/ sensor");
+		zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/15.4/ sensor");
         }
         elsif (is_sle('=15-SP6') || $sp_version == '15.6') {
-            zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP6/ sensor");
+		# zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP6/ sensor");
+		zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/15.6/ sensor");
         }
         elsif (is_sle('=15-SP5') || $sp_version == '15.5') {
-            zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP5/ sensor");
+		#zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP5/ sensor");
+		zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/15.5/ sensor");
         }
         elsif (is_sle('=15-SP4') || $sp_version == '15.4') {
-            zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP4/ sensor");
+		#zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_15_SP4/ sensor");
+		zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/15.4/ sensor");
         }
         elsif (is_sle('=12-SP5') || $sp_version == '12.5') {
-            zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_12_SP5/ sensor");
+		#zypper_call("ar -f --no-gpgcheck http://download.suse.de/ibs/SUSE:/Velociraptor/SLE_12_SP5/ sensor");
+		zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/SLE_12_SP5/ sensor");
         }
 
     }
@@ -53,7 +59,8 @@ sub run {
         zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/security:/sensor/openSUSE_Leap_15.4/ sensor");
     }
     elsif (is_tumbleweed) {
-        zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/security:/sensor/openSUSE_Tumbleweed/ sensor");
+	    #zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/security:/sensor/openSUSE_Tumbleweed/ sensor");
+        zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/openSUSE_Tumbleweed/ sensor");
     }
     else {
         record_info('Skipped', 'Missing source repository', result => 'softfail');
