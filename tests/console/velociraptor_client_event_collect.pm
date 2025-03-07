@@ -53,7 +53,8 @@ sub run {
         zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/security:/sensor/openSUSE_Leap_15.4/ sensor");
     }
     elsif (is_tumbleweed) {
-        zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/security:/sensor/openSUSE_Tumbleweed/ sensor");
+	    #zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/security:/sensor/openSUSE_Tumbleweed/ sensor");
+        zypper_call("ar -f --no-gpgcheck https://download.opensuse.org/repositories/home:/doreilly:/branches:/security:/sensor/openSUSE_Tumbleweed/ sensor");
     }
     else {
         record_info('Skipped', 'Missing source repository', result => 'softfail');
