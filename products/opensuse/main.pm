@@ -159,6 +159,7 @@ sub load_otherDE_tests {
         my $de = get_var("DE_PATTERN");
         loadtest "console/system_prepare";
         loadtest "console/consoletest_setup";
+	loadtest "security/selinux/sestatus";
         loadtest "console/hostname";
         loadtest "update/zypper_clear_repos";
         loadtest "console/install_otherDE_pattern";
