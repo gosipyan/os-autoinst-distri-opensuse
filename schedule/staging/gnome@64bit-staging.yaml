@@ -61,17 +61,18 @@ schedule:
   - console/mtab
   - console/orphaned_packages_check
   - console/consoletest_finish
-  - x11/desktop_runner
-  - x11/setup
-  - x11/xterm
-  - locale/keymap_or_locale_x11
-  - x11/sshxterm
-  - x11/gnome_control_center
-  - x11/gnome_terminal
-  - x11/gedit
-  - x11/glxgears
-  - x11/nautilus
-  - x11/desktop_mainmenu
-  - x11/reboot_gnome
+  - security/selinux/semanage_fcontext
+  - security/selinux/semanage_boolean
+  - security/selinux/fixfiles
+  - security/selinux/print_se_context
+  - security/selinux/audit2allow
+  - security/selinux/semodule
+  - security/selinux/setsebool
+  - security/selinux/restorecon
+  - security/selinux/chcon
+  - security/selinux/chcat
+  - security/selinux/set_get_enforce
+  - security/selinux/selinuxexeccon
+  - security/selinux/setroubleshootd
   - shutdown/cleanup_before_shutdown
   - shutdown/shutdown
