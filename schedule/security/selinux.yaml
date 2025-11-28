@@ -2,13 +2,22 @@ name: selinux
 description: >
     This is for SElinux test
 schedule:
+#    - microos/disk_boot
+#    - transactional/host_config
+#    - update/zypper_clear_repos
+#    - console/zypper_ar
+#    - console/zypper_ref
+#    - transactional/enable_selinux
+#    - microos/services_enabled
     - '{{bootloader_zkvm}}'
     - '{{sle_os_boot}}'
     - '{{alp_boot}}'
     - '{{scc_slem}}'
     - security/selinux/selinux_setup
+    - security/selinux/selinux_migration
     - security/selinux/sestatus
     - '{{sle_os_tests}}'
+#    - security/selinux/selinux_migration
     - security/selinux/semanage_fcontext
     - security/selinux/semanage_boolean
     - security/selinux/fixfiles
@@ -22,7 +31,8 @@ schedule:
     - security/selinux/set_get_enforce
     - security/selinux/selinuxexeccon
     - security/selinux/setroubleshootd
-    - '{{alp_shutdown}}'
+#    - security/selinux/selinux_migration
+#    - '{{alp_shutdown}}'
 conditional_schedule:
     bootloader_zkvm:
         ARCH:
