@@ -18,6 +18,7 @@ use testapi;
 use x11utils 'turn_off_plasma_tooltips';
 
 sub run {
+    sleep 300;
     shift->wait_boot_past_bootloader;
     # This only works with generic-desktop. In the opensuse-welcome case,
     # the opensuse-welcome module will handle it instead.

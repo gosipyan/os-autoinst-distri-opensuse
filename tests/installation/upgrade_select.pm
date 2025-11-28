@@ -90,6 +90,14 @@ sub run {
             send_key $cmd{next};
         }
     }
+    save_screenshot;
+    record_info 'update end test';
+    #send_key('alt-y');
+    send_key 'left';
+    sleep 1;
+    send_key 'ret';
+    save_screenshot;
+    send_key $cmd{next};
 }
 
 1;

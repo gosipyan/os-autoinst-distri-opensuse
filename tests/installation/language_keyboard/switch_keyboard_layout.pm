@@ -10,6 +10,35 @@ use testapi;
 use Utils::Backends;
 
 sub run {
+        save_screenshot;
+	#wait_still_screen 5;
+        record_info 'test 6';
+        wait_still_screen 10;
+        mouse_set(600, 600);
+        mouse_click;
+        mouse_hide(1);
+        send_key 'tab';
+        send_key 'tab';
+        send_key 'ret';
+        send_key 'ret';
+
+        save_screenshot;
+	#        wait_still_screen 5;
+        record_info 'test 6';
+        wait_still_screen 10;
+        mouse_set(600, 600);
+        mouse_click;
+        mouse_hide(1);
+        send_key 'tab';
+        send_key 'tab';
+        send_key 'ret';
+	#send_key 'ret';
+        wait_still_screen 10;
+        mouse_set(600, 600);
+        mouse_click;
+ 
+       
+
     unless (is_qemu) {
         record_info('Skip', 'Switch keyboard not testeable for non-qemu scenarios');
         return;

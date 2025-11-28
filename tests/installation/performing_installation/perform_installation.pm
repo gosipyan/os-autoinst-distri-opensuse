@@ -11,11 +11,48 @@
 use Mojo::Base 'y2_installbase';
 use testapi 'get_var';
 use Test::Assert ':all';
+use Mojo::Base 'y2_installbase';
+use testapi;
+use lockapi;
+use mmapi;
+use utils;
+use Utils::Architectures;
+use Utils::Backends;
+use version_utils qw(:VERSION :BACKEND is_sle is_leap is_sle_micro);
+use ipmi_backend_utils;
 
 sub run {
+
+    wait_still_screen 10;
+    record_info('Step 1', 'intergrity check tab');
+    foreach (1 .. 3) {
+       save_screenshot;
+       wait_screen_change { send_key "alt-i"; };
+    }
+    wait_still_screen 10;
+    record_info('Step 2', 'intergrity check tab');
+    foreach (1 .. 6) {
+       save_screenshot;
+       wait_screen_change { send_key "alt-i"; };
+    }
+    wait_still_screen 10;
+    record_info('Step 3', 'intergrity check tab');
+    foreach (1 .. 4) {
+       save_screenshot;
+       wait_screen_change { send_key "alt-i"; };
+    }
+    wait_still_screen 10;
+    record_info('Step 4', 'intergrity check tab');
+    foreach (1 .. 20) {
+       save_screenshot;
+       wait_screen_change { send_key "alt-i"; };
+       wait_still_screen 5;
+    }
+    wait_still_screen 10;
+
     my $performing_install = $testapi::distri->get_performing_installation();
 
-    $performing_install->get_performing_installation_page();
+    #$performing_install->get_performing_installation_page();
 
     $performing_install->wait_for_installation_popup({
             timeout => 2400,

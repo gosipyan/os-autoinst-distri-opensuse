@@ -48,7 +48,7 @@ sub run {
         check_reboot_changes;
     }
     else {
-        zypper_call("in @packages");
+        zypper_call("--no-gpg-checks in @packages");
     }
     my $cmd = <<'EOF';
 systemctl start salt-master

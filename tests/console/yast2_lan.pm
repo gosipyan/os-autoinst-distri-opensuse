@@ -30,7 +30,7 @@ sub run {
     my $self = shift;
 
     select_console 'root-console';
-    zypper_call "in yast2-network";    # make sure yast2 lan module installed
+    zypper_call "--no-gpg-checks in yast2-network";    # make sure yast2 lan module installed
 
     # those two are for debugging purposes only
     script_run('ip a');

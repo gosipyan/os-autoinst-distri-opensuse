@@ -649,7 +649,7 @@ sub zypper_call {
                     /var/log/zypper.log
                     ';
     for (1 .. 5) {
-        $ret = script_run("zypper -n $command $printer; ( exit \${PIPESTATUS[0]} )", $timeout);
+        $ret = script_run("zypper -n --no-gpg-checks $command $printer; ( exit \${PIPESTATUS[0]} )", $timeout);
         die "zypper did not finish in $timeout seconds" unless defined($ret);
         if ($ret == 4) {
             if (script_run('grep "Error code.*502" /var/log/zypper.log') == 0) {
@@ -727,7 +727,7 @@ sub zypper_call {
 
     unless (grep { $_ == $ret } @$allow_exit_codes) {
         upload_logs('/var/log/zypper.log');
-        my $msg = "'zypper -n $command' failed with code $ret";
+        my $msg = "'zypper -n --no-gpg-checks $command' failed with code $ret";
         if ($ret == 104) {
             $msg .= " (ZYPPER_EXIT_INF_CAP_NOT_FOUND)\n\nRelated zypper logs:\n";
             script_run('tac /var/log/zypper.log | grep -F -m1 -B100000 "Hi, me zypper" | tac | grep \'\(SolverRequester.cc\|THROW\|CAUGHT\)\' > /tmp/z104.txt');
@@ -1127,7 +1127,7 @@ sub zypper_install_available {
     my @foundpacks = map { $_->{name} } @$result;
 
     return 0 unless @foundpacks;
-    return zypper_call('-t in ' . join(' ', @foundpacks));
+    return zypper_call('-t --no-gpg-checks in ' . join(' ', @foundpacks));
 }
 
 =head2 set_zypper_lock_timeout

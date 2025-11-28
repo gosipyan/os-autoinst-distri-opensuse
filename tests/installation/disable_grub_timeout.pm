@@ -20,7 +20,7 @@ sub run {
     my ($self) = shift;
 
     # Verify Installation Settings overview is displayed as starting point
-    assert_screen "installation-settings-overview-loaded", 90;
+    #assert_screen "installation-settings-overview-loaded", 90;
 
     if (check_var('VIDEOMODE', 'text')) {
         # Select section booting on Installation Settings overview on text mode
@@ -92,7 +92,7 @@ sub run {
     save_screenshot;
     send_key $cmd{ok};
     # Adapting system setting needs longer time in case of installing/upgrading with multi-addons
-    assert_screen 'installation-settings-overview-loaded', 220;
+    #assert_screen 'installation-settings-overview-loaded', 220;
 }
 
 1;

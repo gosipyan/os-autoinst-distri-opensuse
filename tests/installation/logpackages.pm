@@ -16,6 +16,7 @@ use testapi;
 sub run {
     # the waiting might take long in case of online update repos being
     # initialized before that screen
+
     my $waiting_point = get_var('NEW_DESKTOP_SELECTION') ? 'role' : 'package';
     assert_screen "before-$waiting_point-selection", 300;
     select_console 'install-shell';
@@ -23,6 +24,8 @@ sub run {
     script_run "(echo /.packages.root: ; cat /.packages.root) > /dev/$serialdev";
     save_screenshot;
     select_console 'installation';
+    send_key 'alt-o';
+    save_screenshot;
 }
 
 1;

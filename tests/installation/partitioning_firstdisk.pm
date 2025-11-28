@@ -14,6 +14,7 @@ use version_utils 'is_storage_ng';
 use partition_setup 'take_first_disk';
 
 sub run {
+    sleep 60;
     take_first_disk;
 }
 

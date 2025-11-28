@@ -16,10 +16,15 @@ use mm_network;
 # poo#9576
 sub run {
     my $self = shift;
+    sleep 300;
+    record_info 'step 1';
     assert_screen("remote_slave_ready", 350);
+    record_info 'step 2';
     mutex_create("installation_ready");
+    record_info 'step 3';
     # wait while whole installation process finishes
     mutex_wait("installation_done");
+    record_info 'step 4';
     $self->wait_boot(bootloader_time => 120);
 }
 
