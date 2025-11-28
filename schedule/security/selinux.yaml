@@ -2,27 +2,46 @@ name: selinux
 description: >
     This is for SElinux test
 schedule:
-    - '{{bootloader_zkvm}}'
-    - '{{sle_os_boot}}'
-    - '{{alp_boot}}'
-    - '{{scc_slem}}'
-    - security/selinux/selinux_setup
-    - security/selinux/sestatus
-    - '{{sle_os_tests}}'
-    - security/selinux/semanage_fcontext
-    - security/selinux/semanage_boolean
-    - security/selinux/fixfiles
-    - security/selinux/print_se_context
-    - security/selinux/audit2allow
-    - security/selinux/semodule
-    - security/selinux/setsebool
-    - security/selinux/restorecon
-    - security/selinux/chcon
-    - security/selinux/chcat
-    - security/selinux/set_get_enforce
-    - security/selinux/selinuxexeccon
-    - security/selinux/setroubleshootd
-    - '{{alp_shutdown}}'
+    - microos/disk_boot
+    - transactional/host_config
+    - update/zypper_clear_repos
+    - console/zypper_ar
+    - console/zypper_ref
+    - transactional/enable_selinux
+    - microos/services_enabled
+    - transactional/disable_timers
+    - microos/networking
+    - security/selinux/selinux_migration
+    - console/ansible
+    - console/salt
+    - transactional/transactional_update
+    - transactional/rebootmgr
+    - transactional/health_check
+    - console/coredump_collect
+#    - '{{bootloader_zkvm}}'
+#    - '{{sle_os_boot}}'
+#    - '{{alp_boot}}'
+#    - '{{scc_slem}}'
+#    - security/selinux/selinux_setup
+#    - security/selinux/selinux_migration
+#    - security/selinux/sestatus
+#    - '{{sle_os_tests}}'
+#    - security/selinux/selinux_migration
+#    - security/selinux/semanage_fcontext
+#    - security/selinux/semanage_boolean
+#    - security/selinux/fixfiles
+#    - security/selinux/print_se_context
+#    - security/selinux/audit2allow
+#    - security/selinux/semodule
+#    - security/selinux/setsebool
+#    - security/selinux/restorecon
+#    - security/selinux/chcon
+#    - security/selinux/chcat
+#    - security/selinux/set_get_enforce
+#    - security/selinux/selinuxexeccon
+#    - security/selinux/setroubleshootd
+#    - security/selinux/selinux_migration
+#    - '{{alp_shutdown}}'
 conditional_schedule:
     bootloader_zkvm:
         ARCH:

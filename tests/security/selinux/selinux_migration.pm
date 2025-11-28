@@ -17,27 +17,19 @@ use Utils::Architectures;
 
 sub run {
     select_serial_terminal;
-
     initial_state();
-
     check_dir();
-
     my $rollback_number = create_snapshot();
-
-    if (script_run("zypper info selinux-policy | grep -q 'out-of-date'")) {
-
-        update_selinux_policy();
-    }
-
-
+    #TODO update test repo
+    zypper_call('ar https://download.opensuse.org/repositories/home:/djz88:/branches:/security:/SELinux/openSUSE_Tumbleweed/ selinux-migration');
+ #zypper_call('ar https://download.opensuse.org/repositories/home:/cahu:/branches:/security:/SELinux:/varlibselinux-fixes/openSUSE_Factory/ selinux-migration');
+    record_info('Updating SELinux policy package.');
+    zypper_call("--gpg-auto-import-keys ref");
+    update_system();
     check_paths();
-
     check_after_update();
-
     check_custom_policy();
-
     rollback_and_verify_state($rollback_number);
-
     cleanup_test_artifacts();
 }
 
@@ -47,11 +39,11 @@ sub initial_state {
     assert_script_run('sestatus | grep "SELinux status:" | awk "{print $3}" | grep -q "enabled"');
     # install selinux packages
     if (is_microos) {
-        trup_call('pkg install selinux-policy-targeted selinux-policy-targeted-gaming policycoreutils policycoreutils-python-utils setools-console podman');
+        trup_call('pkg install selinux-policy-targeted selinux-policy-targeted-gaming policycoreutils policycoreutils-python-utils setools-console podman selinux-policy-targeted-gaming');
         process_reboot(trigger => 1);
     }
     else {
-        zypper_call('install selinux-policy-targeted selinux-policy-targeted-gaming policycoreutils policycoreutils-python-utils setools-console podman');
+        zypper_call('install selinux-policy-targeted selinux-policy-targeted-gaming policycoreutils policycoreutils-python-utils setools-console podman selinux-policy-targeted-gaming');
     }
     record_info('Creating test user and custom policy.');
     assert_script_run('useradd testselinux');
@@ -69,10 +61,17 @@ sub initial_state {
 # create a new SELinux module from a template
 sub create_custom_module {
     my ($name, $type, $class_perm, $policy_rule) = @_;
-    record_info("Creating and installing custom module: $name");
-    my $te_content = "module $name 1.0;\n\nrequire {\n    type $type;\n    class $class_perm;\n};\n\n$policy_rule";
+    record_info("SELinux", "Creating and installing custom module: $name");
+    script_output("cat > ${name}.te <<EOF
+module $name 1.0;
+require {
+    type $type;
+    class $class_perm;
+}
 
-    assert_script_run("echo '$te_content' > ${name}.te");
+$policy_rule
+EOF");
+
     assert_script_run("checkmodule -M -m -o ${name}.mod ${name}.te");
     assert_script_run("semodule_package -o ${name}.pp -m ${name}.mod");
     assert_script_run("semodule -i ${name}.pp");
@@ -106,12 +105,12 @@ sub create_snapshot {
 }
 
 # SELinux policy package update
-sub update_selinux_policy {
-    record_info('Updating SELinux policy');
+sub update_system {
+    record_info('Updating environment');
     zypper_call("--gpg-auto-import-keys ref");
     if (is_microos) {
         validate_script_output('sestatus', sub { m/SELinux status: .*enabled/ && m/Current mode: .*enforcing/ }, fail_message => 'SELinux is NOT enabled and set to enforcing');
-        trup_call('dup', timeout => 600);
+        trup_call('--continue run zypper up --force-resolution  --allow-vendor-change --no-confirm', timeout => 600);
         process_reboot(trigger => 1);
     }
     else {
@@ -120,7 +119,7 @@ sub update_selinux_policy {
     zypper_call('info selinux-policy selinux-policy-targeted selinux-policy-targeted-gaming libsemanage-conf libsemanage2 policycoreutils policycoreutils-python-utils setools-console container-selinux');
     record_info('Adding a second custom module after update.');
     create_custom_module('mycustom2', 'sshd_t', 'process setrlimit', 'allow sshd_t self:process setrlimit;');
-    check_service();
+    check_cleanoldsepoldir_service();
 }
 
 # check the system state after the update
@@ -129,15 +128,15 @@ sub check_after_update {
     script_run('diff -q semodule_list_before_migration.txt <(semodule -l)');
     script_run('diff -q semanage_booleans_before_migration.txt <(semanage boolean -l)');
     script_run('diff -q semanage_login_before_migration.txt <(semanage login -l)');
-
     my $module_list = script_output('semodule -l');
     for my $m (qw(mycustom mycustom2)) {
         if ($module_list =~ /^\Q$m\E\b/m) {
             print "$m present";
         } else {
-            record_info("Module '$m' not found in semodule -l output\n", result => "fail");
+            record_info("[FAIL]","Module '$m' not found in semodule -l output\n", result => "fail");
         }
     }
+    check_gaming_boolean();
 }
 
 # roll back the system to the pre-update state and verify
@@ -145,21 +144,17 @@ sub rollback_and_verify_state {
     my ($rollback_number) = @_;
     record_info("Rolling back to snapshot $rollback_number.");
     assert_script_run("snapper rollback $rollback_number");
-
     record_info('Verifying system state after rollback.');
     my $module_list = script_output('semodule -l');
-
     # check that 'mycustom' present
     for my $m (qw(mycustom)) {
         if ($module_list =~ /^\Q$m\E\b/m) {
             print "$m present";
         } else {
-            record_info("Module '$m' not found in semodule -l output\n", result => "fail");
+            record_info("[FAIL]","Module '$m' not found in semodule -l output\n", result => "fail");
         }
     }
-
-
-    assert_script_run('semanage boolean -l | grep -q "httpd_can_network_connect_db.* on"');
+    assert_script_run('getsebool httpd_can_network_connect_db | grep  "on"');
     assert_script_run('semanage login -l | grep -q "testselinux.*staff_u"');
     assert_script_run('semanage port -l | grep -E "(^SELinux Port Type|http_port_t).*8888"');
     assert_script_run('podman ps --filter name=test1');
@@ -167,23 +162,19 @@ sub rollback_and_verify_state {
         record_info("test1 has correct selinux label");
     }
     else {
-        record_info("wrong selinux label", result => "fail");
+        record_info("[FAIL]","wrong selinux label", result => "fail");
     }
-
-
 }
 
 # test selinux-policy-targeted-gaming boolean
 sub check_gaming_boolean {
-    record_info('Verify gaming boolean is set');
-    zypper_call('in selinux-policy-targeted-gaming');
-
-    my $boolean_list = script_output('getsebool -a');
+    record_info('Verify gaming boolean');
     for my $boolean (qw(selinuxuser_execstack selinuxuser_execmod)) {
-        if ($boolean_list =~ /^\Q$boolean\E\b/m) {
-            print "$boolean present";
+        my $out = script_output("getsebool $boolean");
+        if ($out =~ /on$/) {
+            record_info($boolean, "Is on");
         } else {
-            record_info("Module '$boolean' not found in getsebool -a output\n", result => "fail");
+            die "$boolean, Is off or missing";
         }
     }
 }
@@ -200,17 +191,16 @@ sub check_paths {
             script_run('echo "[PASS] no /var/lib/selinux paths found"');
             record_info("[PASS] no /var/lib/selinux paths found");
         }
-
     }
 }
 
-# check /var/lib/selinux deleted
+## check /var/lib/selinux deleted
 sub check_dir {
     if (script_run("grep -rq '/var/lib/selinux/' /.snapshots/*") == 0) {
         record_info("[FAIL]", "/var/lib/selinux exist in old snapshots", result => "fail");
     }
     elsif (-d "/var/lib/selinux") {
-        record_info("[FAIL]", "/var/lib/selinux not delted", result => "fail");
+        record_info("[FAIL]", "/var/lib/selinux not deleted", result => "fail");
     }
     else {
         record_info("[PASS]", "/var/lib/selinux not present");
@@ -218,37 +208,40 @@ sub check_dir {
 }
 
 # check cleanoldsepoldir.service
-sub check_service {
-    if (script_run("systemctl list-unit-files --type=service | grep -qw cleanoldsepoldir.service") == 0) {
-        my $status = script_output("systemctl is-enabled cleanoldsepoldir.service");
-        return $status;
+sub check_cleanoldsepoldir_service {
+    my $service = "cleanoldsepoldir.service";
+    my $enabled = script_output("systemctl is-enabled $service");
+    if ($enabled) {
+        record_info("[PASS]", "$service is enabled and active");
     } else {
-        record_info("[FAIL]", "cleanoldsepoldir.service not detected", result => "fail");
+        my $exists = script_output("systemctl list-unit-files $service");
+        my $error_msg = $exists ? "$service is present but disabled" : "$service not found";
+        record_info("[FAIL]", $error_msg, result => "fail");
     }
 }
+
+
 # add custom modules
 sub check_custom_policy {
-    script_run("wget --no-check-certificate -O factory-custom-modules.txt https://gitlab.suse.de/selinux/selinux-monitoring/-/raw/main/factory-custom-modules.txt?ref_type=heads");
+    # get list of SELinux specific modules
     my $modules = script_output('zypper -n se -s | awk "{print \$2}" | grep -E -- "-selinux$" | sort -u', timeout => 300);
     my @packages;
     foreach my $module (split /\n/, $modules) {
         next unless $module;
-        next if $module eq 'forgejo-selinux';
-        next if $module eq 'rke2-selinux';
-        record_info("Package $module installing");
-        if (is_microos) {
-            trup_call("pkg install $module");
-        }
-        else {
-            script_output("zypper -n -i in $module");
-        }
+        next if ($module eq 'forgejo-selinux' || $module eq 'rke2-selinux');
         push @packages, $module;
-        if (is_microos) {
-            process_reboot(trigger => 1);
-        }
-
     }
-
+    return unless @packages;
+    print(@packages);
+    my $package_list = join(' ', @packages);
+    record_info("Installing packages", $package_list);
+    if (is_microos) {
+        trup_call("pkg install $package_list");
+        process_reboot(trigger => 1);
+    }
+    else {
+        script_run("zypper -n in -y $package_list", timeout => 600);
+    }
     check_paths(@packages);
 }
 
@@ -263,6 +256,6 @@ sub cleanup_test_artifacts {
     script_run('rm -f semodule_list_before_migration.txt semanage_booleans_before_migration.txt semanage_login_before_migration.txt');
     script_run('rm -f semanage_ports_before_migration.txt semanage_fcontexts_before_migration.txt');
     script_run('snapper list | grep "Before SELinux update" | awk "{print \$1}" | xargs -r snapper delete');
+    script_run('snapper rollback');
 }
-
 1;
