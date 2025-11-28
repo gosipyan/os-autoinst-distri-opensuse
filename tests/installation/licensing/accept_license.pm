@@ -10,6 +10,24 @@ use Mojo::Base 'y2_installbase';
 use testapi;
 
 sub run {
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+
     $testapi::distri->get_license_agreement()->accept_license();
 }
 

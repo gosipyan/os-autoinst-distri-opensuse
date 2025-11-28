@@ -80,6 +80,75 @@ sub _set_timeout {
 }
 
 sub run {
+
+     # --- STEP 1: (3 Tabs) ---
+    wait_still_screen 20;
+    record_info('Step 1', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 3) {
+       wait_screen_change { send_key "f10" };
+       save_screenshot;
+       #       mouse_set(600, 600);
+       #mouse_click;
+       #mouse_hide(1);
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'ret';
+       #send_key 'ret';
+    }
+    #send_key 'ret';
+    wait_still_screen 20;
+    record_info('Step 2', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 6) {
+       #wait_screen_change { send_key "tab" };
+       wait_screen_change { send_key "f10" };
+       save_screenshot;
+       #mouse_set(600, 600);
+       #mouse_click;
+       #mouse_hide(1);
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'ret';
+       #send_key 'ret';
+    }
+    #send_key 'ret';
+    wait_still_screen 20;
+    record_info('Step 3', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 4) {
+       #wait_screen_change { send_key "tab" };
+       wait_screen_change { send_key "f10" };
+       save_screenshot;
+       #mouse_set(600, 600);
+       #mouse_click;
+       #mouse_hide(1);
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'ret';
+       #send_key 'ret';
+    }
+    #send_key 'ret';
+    wait_still_screen 20;
+    record_info('Step 4', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 10) {
+       #wait_screen_change { send_key "tab" };
+       wait_screen_change { send_key "f10" };
+       save_screenshot;
+       # mouse_set(600, 600);
+       #mouse_click;
+       #mouse_hide(1);
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       #send_key 'ret';
+       #send_key 'ret';
+    }
+    #send_key 'ret';
     my $self = shift;
     # NET isos are slow to install
     # If this timeout needs to be bumped again, we might be having a bigger network problem

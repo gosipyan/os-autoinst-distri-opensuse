@@ -11,8 +11,83 @@
 use Mojo::Base 'y2_installbase';
 use testapi 'get_var';
 use Test::Assert ':all';
+use Mojo::Base 'y2_installbase';
+use testapi;
+use lockapi;
+use mmapi;
+use utils;
+use Utils::Architectures;
+use Utils::Backends;
+use version_utils qw(:VERSION :BACKEND is_sle is_leap is_sle_micro);
+use ipmi_backend_utils;
 
 sub run {
+
+    # --- STEP 1: (3 Tabs) ---
+    wait_still_screen 20;
+    record_info('Step 1', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 3) {
+	    #wait_screen_change { send_key "tab" };
+       save_screenshot;
+       #       mouse_set(600, 600);
+       mouse_click;
+       mouse_hide(1);
+       send_key 'tab';
+       send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       send_key 'ret';
+       send_key 'ret';
+    }
+    wait_still_screen 20;
+    record_info('Step 2', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 6) {
+       #wait_screen_change { send_key "tab" };
+       #wait_screen_change { send_key "f10" };
+       save_screenshot;
+       mouse_set(600, 600);
+       mouse_click;
+       mouse_hide(1);
+       send_key 'tab';
+       send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       send_key 'ret';
+       send_key 'ret';
+    }
+    wait_still_screen 20;
+    record_info('Step 3', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 4) {
+       #wait_screen_change { send_key "tab" };
+       #wait_screen_change { send_key "f10" };
+       save_screenshot;
+       mouse_set(600, 600);
+       mouse_click;
+       mouse_hide(1);
+       send_key 'tab';
+       send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       send_key 'ret';
+       send_key 'ret';
+    }
+    wait_still_screen 20;
+    record_info('Step 4', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 10) {
+       #wait_screen_change { send_key "tab" };
+       #wait_screen_change { send_key "f10" };
+       save_screenshot;
+       mouse_set(600, 600);
+       mouse_click;
+       mouse_hide(1);
+       send_key 'tab';
+       send_key 'tab';
+       #send_key 'tab';
+       #send_key 'tab';
+       send_key 'ret';
+       send_key 'ret';
+    }
+
     my $performing_install = $testapi::distri->get_performing_installation();
 
     $performing_install->get_performing_installation_page();

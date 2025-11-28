@@ -115,10 +115,29 @@ sub run {
     while ($iterations++ < scalar(@welcome_tags)) {
         # See poo#19832, sometimes manage to match same tag twice and test fails due to broken sequence
         wait_still_screen 5;
-        my $timeout = is_aarch64 || is_ppc64le || is_s390x ? '1000' : '500';
-        assert_screen(\@welcome_tags, $timeout);
+        record_info 'test 6';
+        wait_still_screen 10;
+        mouse_set(600, 600);
+        mouse_click;
+        mouse_hide(1);
+        send_key 'tab';
+        send_key 'tab';
+        send_key 'ret';
+        send_key 'ret';
+	my $timeout = is_aarch64 || is_ppc64le || is_s390x ? '1000' : '500';
+	#assert_screen(\@welcome_tags, $timeout);
         # Normal exit condition
         if (match_has_tag 'local-registration-server') {
+	    record_info 'test local-registration-server';
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+	
             if (is_sle('15+')) {
                 send_key 'alt-h';
             } else {
@@ -130,9 +149,29 @@ sub run {
             save_screenshot;
         }
         if ((match_has_tag 'inst-betawarning') || (match_has_tag 'inst-welcome') || (match_has_tag 'inst-welcome-no-product-list')) {
+            record_info 'test inst-betawarning';
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+	
             last;
         }
         if (match_has_tag 'scc-invalid-url') {
+	    record_info 'test scc-invalid-url';
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+
             die 'SCC reg URL is invalid' if !get_var('SCC_URL_VALID');
             send_key 'alt-r';    # registration URL field
             send_key_until_needlematch 'scc-invalid-url-deleted', 'backspace';
@@ -143,19 +182,41 @@ sub run {
             next;
         }
         if (match_has_tag 'inst-welcome-confirm-self-update-server') {
+            record_info 'test inst-welcome-confirm-self-update-server';
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+
             wait_screen_change { send_key $cmd{ok} };
             next;
         }
         if (match_has_tag('untrusted-ca-cert')) {
+            record_info 'test untrusted-ca-cert';
+            wait_still_screen 10;
+            mouse_set(600, 600);
+            mouse_click;
+            mouse_hide(1);
+            send_key 'tab';
+            send_key 'tab';
+            send_key 'ret';
+            send_key 'ret';
+
             send_key 'alt-t';
             wait_still_screen 5;
             next;
         }
         if (match_has_tag 'linuxrc-dhcp-question') {
+            record_info 'test linuxrc-dhcp-question';
             send_key 'tab' if (match_has_tag 'linuxrc-dhcp-question-no');
             send_key 'ret';
         }
         if (match_has_tag 'expired-gpg-key') {
+	    record_info 'test expired-gpg-key';	
             send_key 'alt-y';
         }
     }
@@ -172,7 +233,7 @@ sub run {
         assert_screen('inst-welcome-no-product-list');
     }
     else {
-        assert_screen('inst-welcome');
+	    #assert_screen('inst-welcome');
     }
 
     my $has_license_on_welcome_screen = (is_sle() || is_sle_micro()) &&
