@@ -2,11 +2,28 @@ name: selinux
 description: >
     This is for SElinux test
 schedule:
+#    - microos/disk_boot
+#    - transactional/host_config
+#    - update/zypper_clear_repos
+#    - console/zypper_ar
+#    - console/zypper_ref
+#    - transactional/enable_selinux
+#    - microos/services_enabled
+#    - transactional/disable_timers
+#    - microos/networking
+#    - security/selinux/selinux_migration
+#    - console/ansible
+#    - console/salt
+#    - transactional/transactional_update
+#    - transactional/rebootmgr
+#    - transactional/health_check
+#    - console/coredump_collect
     - '{{bootloader_zkvm}}'
     - '{{sle_os_boot}}'
     - '{{alp_boot}}'
     - '{{scc_slem}}'
     - security/selinux/selinux_setup
+    - security/selinux/selinux_migration
     - security/selinux/sestatus
     - '{{sle_os_tests}}'
     - security/selinux/semanage_fcontext

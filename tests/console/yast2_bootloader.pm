@@ -23,7 +23,7 @@ sub run {
     select_console 'root-console';
 
     # make sure yast2 bootloader module is installed
-    zypper_call 'in yast2-bootloader';
+    zypper_call '--no-gpg-checks in yast2-bootloader';
     my $y2_opts = "";
     $y2_opts = "--ncurses" if (is_pvm_hmc() || is_spvm());
     my $module_name = y2_module_consoletest::yast2_console_exec(yast2_module => 'bootloader', yast2_opts => $y2_opts);

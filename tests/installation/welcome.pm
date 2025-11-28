@@ -88,6 +88,7 @@ sub get_product_shortcuts {
 }
 
 sub run {
+
     my ($self) = @_;
     my $iterations;
     my @welcome_tags = ('inst-welcome-confirm-self-update-server', 'scc-invalid-url');
@@ -107,6 +108,9 @@ sub run {
     # stuck in linuxrc asking if dhcp should be used"
     push @welcome_tags, 'linuxrc-dhcp-question';
     if (is_sle('=15')) {
+       save_screenshot;
+       send_key("alt-y");
+	    
         record_info('bsc#1179654', 'Needs at least libzypp-17.4.0 to avoid validation check failed');
         push @welcome_tags, 'expired-gpg-key';
     }
@@ -114,25 +118,54 @@ sub run {
     # Process expected pop-up windows and exit when welcome/beta_war is shown or too many iterations
     while ($iterations++ < scalar(@welcome_tags)) {
         # See poo#19832, sometimes manage to match same tag twice and test fails due to broken sequence
-        wait_still_screen 5;
-        my $timeout = is_aarch64 || is_ppc64le || is_s390x ? '1000' : '500';
-        assert_screen(\@welcome_tags, $timeout);
+	save_screenshot;
+	sleep 20;
+	record_info 'unsigned file pop up';
+	wait_still_screen(5);
+	#wait_screen_change { send_key 'alt-y' };
+	send_key("alt-y");
+	sleep 10;
+	send_key("alt-y");
+	save_screenshot;
+	my $timeout = is_aarch64 || is_ppc64le || is_s390x ? '1000' : '1000';
+	assert_screen(\@welcome_tags , $timeout);
+	record_info 'after assert';
         # Normal exit condition
         if (match_has_tag 'local-registration-server') {
+	    record_info 'test local-registration-server';
+	    #sleep 5;
+	    save_screenshot;
+	    send_key("alt-y");
+	    wait_screen_change { send_key 'alt-y' };
             if (is_sle('15+')) {
                 send_key 'alt-h';
             } else {
+		record_info 'second pop up';    
                 send_key 'alt-r';
             }
-            wait_still_screen 5;
+	    record_info 'third pop up';
+	    #wait_still_screen 5;
             send_key 'alt-o';
-            wait_still_screen 5;
+	    #wait_still_screen 5;
             save_screenshot;
         }
         if ((match_has_tag 'inst-betawarning') || (match_has_tag 'inst-welcome') || (match_has_tag 'inst-welcome-no-product-list')) {
+            record_info 'test inst-betawarning';
+            save_screenshot;
+	    #sleep 5;
+            send_key("alt-y");
+	    #wait_screen_change { send_key 'alt-y' };
+	    #send_key 'ret';
+	
             last;
         }
         if (match_has_tag 'scc-invalid-url') {
+	    record_info 'test scc-invalid-url';
+            save_screenshot;
+	    #sleep 5;
+            send_key("alt-y");
+	    wait_screen_change { send_key 'alt-y' };
+
             die 'SCC reg URL is invalid' if !get_var('SCC_URL_VALID');
             send_key 'alt-r';    # registration URL field
             send_key_until_needlematch 'scc-invalid-url-deleted', 'backspace';
@@ -143,25 +176,56 @@ sub run {
             next;
         }
         if (match_has_tag 'inst-welcome-confirm-self-update-server') {
+            record_info 'test inst-welcome-confirm-self-update-server';
+            save_screenshot;
+	    #sleep 5;
+            send_key("alt-y");
+	    wait_screen_change { send_key 'alt-y' };
+
             wait_screen_change { send_key $cmd{ok} };
             next;
         }
         if (match_has_tag('untrusted-ca-cert')) {
+            record_info 'test untrusted-ca-cert';
+            save_screenshot;
+	    #sleep 5;
+            send_key("alt-y");
+	    wait_screen_change { send_key 'alt-y' };
+	    
+
             send_key 'alt-t';
             wait_still_screen 5;
             next;
         }
         if (match_has_tag 'linuxrc-dhcp-question') {
+            record_info 'test linuxrc-dhcp-question';
+            save_screenshot;
+	    #sleep 5;
+            send_key("alt-y");
+	    wait_screen_change { send_key 'alt-y' };
+	    
             send_key 'tab' if (match_has_tag 'linuxrc-dhcp-question-no');
             send_key 'ret';
         }
         if (match_has_tag 'expired-gpg-key') {
+            save_screenshot;
+	    #sleep 5;
+            send_key("alt-y");
+	    wait_screen_change { send_key 'alt-y' };
+
+	    record_info 'test expired-gpg-key';	
             send_key 'alt-y';
         }
     }
 
     # Process beta warning if expected
     if ($expect_beta_warn) {
+        save_screenshot;
+	#sleep 5;
+        send_key("alt-y");
+	wait_screen_change { send_key 'alt-y' };
+
+	record_info 'test process beta warning';
         assert_screen 'inst-betawarning';
         wait_screen_change { send_key 'ret' };
     }
@@ -169,10 +233,27 @@ sub run {
     ensure_fullscreen;
 
     if (is_sle('15+') && get_var('UPGRADE')) {
+        save_screenshot;
+	#sleep 5;
+        send_key("alt-y");
+	wait_screen_change { send_key 'alt-y' };
+	    
         assert_screen('inst-welcome-no-product-list');
     }
     else {
-        assert_screen('inst-welcome');
+	    wait_screen_change { send_key 'ret' };
+	    if (check_var('DESKTOP', 'textmode')){
+                record_info 'test license agreement accept';
+		send_key("alt-y");
+		#send_key 'f10';
+	    }
+            else{
+                save_screenshot;
+                send_key("alt-y");
+		wait_screen_change { send_key 'alt-y' };
+
+	        assert_screen('inst-welcome');
+	}
     }
 
     my $has_license_on_welcome_screen = (is_sle() || is_sle_micro()) &&
@@ -187,6 +268,10 @@ sub run {
     # license+lang +product (on sle15)
     # On sle 15 license is on different screen, here select the product
     if ($has_product_selection) {
+        save_screenshot;
+        send_key("alt-y");
+	wait_screen_change { send_key 'alt-y' };
+
         assert_screen('select-product');
         my $product = get_required_var('SLE_PRODUCT');
         if (check_var('VIDEOMODE', 'text')) {

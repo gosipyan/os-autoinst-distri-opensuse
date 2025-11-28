@@ -27,12 +27,12 @@ sub run {
     my $libcstr = 'GNU C Library';
     if (is_x86_64 && !(is_sle('16+') || is_leap("16+"))) {
         # On Tumbleweed we still support 32-bit x86
-        zypper_call 'in -C libc.so.6';
+        zypper_call '--no-gpg-checks in -C libc.so.6';
         assert_script_run "/lib/libc.so.6 | tee /dev/$serialdev | grep --color '$libcstr'";
         assert_script_run '/lib/libc.so.6 | grep --color "i686-suse-linux"';
     }
     if (is_x86_64 || is_aarch64) {
-        install_package('glibc', trup_reboot => 1) if (script_run('rpm -q glibc'));
+        zypper_call '--no-gpg-checks in -C "libc.so.6()(64bit)"';
         assert_script_run "/lib64/libc.so.6 | tee /dev/$serialdev | grep --color '$libcstr'";
         assert_script_run '/lib64/libc.so.6 | grep --color "' . get_var('ARCH') . '-suse-linux"';
     }

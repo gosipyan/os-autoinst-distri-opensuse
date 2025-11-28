@@ -80,6 +80,39 @@ sub _set_timeout {
 }
 
 sub run {
+
+     # --- STEP 1: (3 Tabs) ---
+    wait_still_screen 20;
+    record_info('Step 1', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 3) {
+       wait_screen_change { send_key "alt-i"; };
+       save_screenshot;
+       send_key 'alt-i';
+    }
+    #send_key 'ret';
+    wait_still_screen 20;
+    record_info('Step 2', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 6) {
+       wait_screen_change { send_key "alt-i"; };
+       save_screenshot;
+       send_key 'alt-i';
+    }
+    #send_key 'ret';
+    wait_still_screen 20;
+    record_info('Step 3', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 4) {
+       wait_screen_change { send_key "alt-i"; };
+       save_screenshot;
+       send_key 'alt-i';       
+    }
+    wait_still_screen 20;
+    record_info('Step 4', 'Focusing and sending 3 Tabs');
+    foreach (1 .. 20) {
+       wait_still_screen 20;
+       wait_screen_change { send_key "alt-i"; };
+       save_screenshot;
+       send_key 'alt-i';       
+    }
     my $self = shift;
     # NET isos are slow to install
     # If this timeout needs to be bumped again, we might be having a bigger network problem
@@ -171,6 +204,7 @@ sub run {
         }
         #
         if (match_has_tag 'package-update-found') {
+            send_key 'alt-y';
             send_key 'alt-n';
             next;
         }

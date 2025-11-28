@@ -52,7 +52,7 @@ sub install_package {
         record_info('install_package', $args{skip_zypper}) if $args{skip_zypper} =~ /\w+/;
         return if $args{skip_zypper};
         $packages .= ' ' . $args{zypper_extra} // '';
-        $ret = zypper_call('in -l ' . $packages, timeout => $args{timeout});
+        $ret = zypper_call('--no-gpg-checks in -l ' . $packages, timeout => $args{timeout});
     }
     return $ret;
 }

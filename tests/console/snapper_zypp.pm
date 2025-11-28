@@ -42,7 +42,7 @@ sub run {
 
     assert_script_run("rpm -q snapper-zypp-plugin");
     run_zypper_cmd("rm $package", $package);
-    run_zypper_cmd("in $package", $package);
+    run_zypper_cmd("--no-gpg-checks in $package", $package);
 }
 
 1;

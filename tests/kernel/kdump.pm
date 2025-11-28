@@ -14,6 +14,7 @@ use kdump_utils;
 sub run {
     my ($self) = @_;
     select_console('root-console');
+    script_output("zypper lr -U");
     configure_service(test_type => 'function', yast_interface => 'cli');
     check_function(test_type => 'function');
 

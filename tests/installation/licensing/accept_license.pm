@@ -10,6 +10,15 @@ use Mojo::Base 'y2_installbase';
 use testapi;
 
 sub run {
+
+    save_screenshot;
+    record_info 'accept license';
+    sleep 10;
+    send_key("alt-y");
+    sleep 10;
+    send_key("alt-y");
+    save_screenshot;
+
     $testapi::distri->get_license_agreement()->accept_license();
 }
 

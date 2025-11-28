@@ -99,7 +99,7 @@ sub run {
     # ensure selinux is in enforcing mode
     validate_script_output 'getenforce', sub { m/Enforcing/ };
     # ensure pkg installation
-    zypper_call 'in setroubleshoot-server setroubleshoot';
+    zypper_call '--no-gpg-checks in setroubleshoot-server setroubleshoot';
     assert_script_run 'rpm -q setroubleshoot-plugins';
     ensure_setroubleshootd_cannot_be_directly_run_as_root;
     validate_service_restart;

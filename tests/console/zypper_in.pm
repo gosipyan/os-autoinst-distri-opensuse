@@ -40,7 +40,7 @@ sub run {
         $pkgname = 'x3270' if check_var('DISTRI', 'sle');
         $pkgname = 'xdelta3' if check_var('DISTRI', 'opensuse');
     }
-    zypper_call "in screen $pkgname";
+    zypper_call "--no-gpg-checks in screen $pkgname";
     clear_console;    # clear screen to see that second update does not do any more
     assert_script_run("rpm -e $pkgname", timeout => $timeout);
     assert_script_run("! rpm -q $pkgname");

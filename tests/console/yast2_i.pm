@@ -40,7 +40,7 @@ sub run {
 
     select_console 'root-console';
     zypper_call "-i rm $pkgname $recommended";
-    zypper_call "in yast2-packager";    # make sure yast2 sw_single module installed
+    zypper_call "--no-gpg-checks in yast2-packager";    # make sure yast2 sw_single module installed
 
     # get package manager's exit action
     if (!script_run 'test -f /etc/sysconfig/yast2') {

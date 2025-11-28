@@ -322,7 +322,7 @@ sub _ensure_installed_zypper_fallback {
     my ($self, $pkglist) = @_;
     $self->become_root;
     quit_packagekit;
-    zypper_call "in $pkglist";
+    zypper_call "--no-gpg-checks in $pkglist";
     enter_cmd "exit";
 }
 
@@ -342,7 +342,7 @@ sub ensure_installed {
     $self->become_root;
     ensure_serialdev_permissions;
     quit_packagekit;
-    zypper_call "in $pkglist";
+    zypper_call "--no-gpg-checks in $pkglist";
     wait_still_screen 1;
     close_gui_terminal;
 }

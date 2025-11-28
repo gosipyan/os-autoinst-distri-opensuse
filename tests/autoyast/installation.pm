@@ -103,6 +103,26 @@ sub verify_timeout_and_check_screen {
 }
 
 sub run {
+	sleep 100;
+	wait_still_screen 5;
+	record_info 'pop up 1';
+	save_screenshot;
+	sleep 5;
+	send_key 'alt-y';
+
+	record_info 'pop up 2';
+	save_screenshot;
+	sleep 5;
+	send_key 'alt-y';
+	sleep 30;
+	#record_info('Step 4', 'Ignore tabs');
+	#foreach (1 .. 30) {
+	#save_screenshot;
+	#send_key 'alt-i';
+	#sleep 10;
+	#}
+	#send_key 'ret';
+	
     my ($self) = @_;
 
     test_ayp_url unless get_var('IPXE_STATIC');
@@ -168,6 +188,14 @@ sub run {
     my $i = 1;
     my $num_errors = 0;
     my $timer = 0;    # Prevent endless loop
+
+    foreach (1 .. 30) {
+    record_info('Step 4', 'Ignore tabs');
+    save_screenshot;
+    send_key 'alt-i';
+    sleep 10;
+        }
+
 
     check_screen \@needles, $check_time;
     until (match_has_tag('reboot-after-installation')
@@ -246,6 +274,26 @@ sub run {
             wait_screen_change { send_key 'ret' };
             @needles = grep { $_ ne 'autoyast-confirm' } @needles;
             $confirmed = 1;
+	    #sleep 120;
+	    #wait_still_screen 5;
+	    #record_info 'pop up 1';
+	    #save_screenshot;
+	    #sleep 5;
+	    #send_key 'alt-y';
+
+	    #record_info 'pop up 2';
+	    #save_screenshot;
+	    #sleep 5;
+	    #send_key 'alt-y';
+	    #sleep 30;
+            record_info('Step 4', 'Ignore tabs');
+            foreach (1 .. 15){
+            save_screenshot;
+            send_key 'alt-i';
+            sleep 10;
+            }
+            send_key 'ret';
+
         }
         elsif (match_has_tag('autoyast-license')) {
             accept_license;
@@ -323,6 +371,7 @@ sub run {
     }
 
     if (get_var("AUTOYAST_CONFIRM")) {
+	sleep 30;
         die "autoyast_confirm" if !$confirmed;
     }
 

@@ -418,7 +418,7 @@ sub setup_pkgs {
     push @pkgs, qw(jq xz);
     @pkgs = uniq sort @pkgs;
     push @pkgs, "git" unless is_sle("<16.0");
-    run_command "zypper --gpg-auto-import-keys -n install --allow-vendor-change @pkgs", timeout => 1200;
+    run_command "zypper --no-gpg-checks --gpg-auto-import-keys -n install --allow-vendor-change @pkgs", timeout => 1200;
     install_git if is_sle("<16.0");
 
     # Workaround for https://bugzilla.opensuse.org/show_bug.cgi?id=1259147

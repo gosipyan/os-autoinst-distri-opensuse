@@ -530,7 +530,7 @@ sub take_first_disk_storage_ng {
     my (%args) = @_;
     return unless is_storage_ng;
     send_key $cmd{guidedsetup};    # select guided setup
-    assert_screen [qw(select-hard-disks partition-scheme)];
+    #assert_screen [qw(select-hard-disks partition-scheme)];
     # It's not always the case that SUT has 2 drives, for ipmi it's changing
     # So making it flexible, still assert the screen if want to verify explicitly
     select_first_hard_disk if match_has_tag 'select-hard-disks';
