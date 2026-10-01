@@ -55,6 +55,8 @@ sub system_scan {
     assert_script_run("fixfiles check > $file_output 2>&1", timeout => 300);
     my $mislabeled = script_output("grep -i 'Would relabel' $file_output || true");
     if ($mislabeled) {
+	script_run("ls -laZ /etc/ld.so.*");
+	script_run("ls -laZ /run/systemd/io.systemd.ManagedOOM");
         record_soft_failure("bsc#1270243 - Mislabeled system files detected:\n\n$mislabeled");
     } else {
         record_info('System scan', 'No mislabeled system files found');
